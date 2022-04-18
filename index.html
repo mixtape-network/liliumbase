@@ -210,6 +210,16 @@ td {
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.1/sql-wasm.js"></script>
 <script>
+const hex2str = (hex) => {
+  return decodeURIComponent('%' + hex.match(/.{1,2}/g).join('%'));
+}
+const str2hex = (str) => {
+  return Array.from(str).map(c => 
+    c.charCodeAt(0) < 128 ? c.charCodeAt(0).toString(16) : 
+    encodeURIComponent(c).replace(/\%/g,'').toLowerCase()
+  ).join('');
+}
+
 class Loader {
   async init() {
     const sqlPromise = initSqlJs({
@@ -316,7 +326,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loader.init()
   let match = /.*%23(.+)/.exec(location.href)
   if (match && match.length > 0) {
-    let query = JSON.parse(decodeURIComponent(match[1]))
+    let query = JSON.parse(hex2str(match[1]))
     document.querySelector("#select").value = (query.select ? query.select : "*")
     document.querySelector("#where").value = (query.where ? query.where : "")
     document.querySelector("#limit").value = (query.limit ? query.limit : 200)
@@ -330,7 +340,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       where: document.querySelector("#where").value,
       limit: document.querySelector("#limit").value
     }
-    location.href = location.protocol + "//" + location.host + "?%23" + JSON.stringify(query)
+    location.href = location.protocol + "//" + location.host + "?%23" + str2hex(JSON.stringify(query))
   })
   document.querySelector(".container").addEventListener("click", (e) => {
     let target = (e.target.className === "row" ? e.target : (e.target.closest(".row") ? e.target.closest(".row") : null))
@@ -348,7 +358,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         where: document.querySelector("#where").value,
         limit: document.querySelector("#limit").value
       }
-      location.href = location.protocol + "//" + location.host + "?%23" + JSON.stringify(query)
+      location.href = location.protocol + "//" + location.host + "?%23" + str2hex(JSON.stringify(query))
     }
   })
 })
