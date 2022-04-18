@@ -281,6 +281,12 @@ class Loader {
       console.log(properties)
       html = properties.map((p) => {
         let attributes = p.attributes
+
+        // attach image and uri
+        attributes.image = p.image
+        attributes.uri = p.uri
+        attributes.name = p.name
+
         let keys = Object.keys(attributes)
         let table = keys.map((key) => {
           return `<tr class='row' data-key="${key}" data-val="${attributes[key]}"><td>${key}</td><td>${attributes[key]}</td></tr>`
