@@ -6,12 +6,12 @@
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="liliumbase" />
 <meta name="twitter:description" content="The entire Lilium NFT universe in a single Git repository." />
-<meta name="twitter:image" content="https://liliumbase.mixtape.network/mixtape_.png" />
+<meta name="twitter:image" content="https://liliumbase.mixtape.network/mixtape.png" />
 <meta property="og:url" content="https://liliumbase.mixtape.network" />
 <meta property="og:type" content="website" />
 <meta property="og:title" content="liliumbase" />
 <meta property="og:description" content="The entire Lilium NFT universe in a single Git repository." />
-<meta property="og:image" content="https://liliumbase.mixtape.network/mixtape_.png" />
+<meta property="og:image" content="https://liliumbase.mixtape.network/mixtape.png" />
 <style>
 @font-face {
     font-family: 'visitor_tt1_brkregular';
@@ -248,12 +248,6 @@ class Loader {
       sql += " LIMIT 200"
     }
 
-    let q = {}
-    if (select) q.select = select
-    if (where) q.where = where
-    if (limit) q.limit = limit
-    //location.hash = encodeURIComponent(JSON.stringify(q))
-    location.hash = JSON.stringify(q)
     const contents = this.db.exec(sql)
     let index = 0;
     let columns = []
@@ -278,7 +272,6 @@ class Loader {
         }
         properties.push(o)
       }
-      console.log(properties)
       html = properties.map((p) => {
         let attributes = p.attributes
 
@@ -321,8 +314,9 @@ class Loader {
 document.addEventListener("DOMContentLoaded", async () => {
   const loader = new Loader()
   await loader.init()
-  if (location.hash && location.hash.length > 1) {
-    let query = decodeURIComponent(location.hash.slice(1))
+  let match = /.*%23(.+)/.exec(location.href)
+  if (match && match.length > 0) {
+    let query = JSON.parse(decodeURIComponent(match[1]))
     document.querySelector("#select").value = (query.select ? query.select : "*")
     document.querySelector("#where").value = (query.where ? query.where : "")
     document.querySelector("#limit").value = (query.limit ? query.limit : 200)
@@ -336,7 +330,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       where: document.querySelector("#where").value,
       limit: document.querySelector("#limit").value
     }
-    loader.next(query)
+    location.href = location.protocol + "//" + location.host + "?%23" + JSON.stringify(query)
   })
   document.querySelector(".container").addEventListener("click", (e) => {
     let target = (e.target.className === "row" ? e.target : (e.target.closest(".row") ? e.target.closest(".row") : null))
@@ -354,7 +348,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         where: document.querySelector("#where").value,
         limit: document.querySelector("#limit").value
       }
-      loader.next(query)
+      location.href = location.protocol + "//" + location.host + "?%23" + JSON.stringify(query)
     }
   })
 })
